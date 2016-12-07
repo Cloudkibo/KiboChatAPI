@@ -1,0 +1,246 @@
+---
+swagger: "2.0"
+info:
+  description: "Welcome to the KiboChat API documentation! Our API provides flexible\
+    \ tools that can be used in the creation of new, outstanding projects.\nPlease\
+    \ note that this documentation refers to the API 1.0 version. API 2.0 version\
+    \ is currently under construction and will be released soon.\n\nBuild something\
+    \ great!\n\n## Basic Usage\nAll KiboChat API requests start with `https://api.cloudkibo.com/api/`\n\
+    \nThe next segment of the URI path depends on the type of request. For example:\n\
+    \n`https://api.cloudkibo.com/v1/users/me`\n\nto get all details of a logged in\
+    \ user.\n\n## Authentication\nEach client application needs to login with facebook\
+    \ and send the facebook token to server with each request.\n\n## Error Handling\n\
+    Errors are returned using standard HTTP error code syntax. In general, codes in\
+    \ the 2xx range indicate success, codes in the 4xx range indicate an error (bad\
+    \ or missing parameters, not authenticated etc.), and codes in the 5xx range indicate\
+    \ an error with KiboSupport’s servers. Any additional info is included in the\
+    \ body of the return call, JSON-formatted. In some old API requests, we return\
+    \ JSON body with status key in it.\n\n## Cross-Domain\nAll cross-domain API requests\
+    \ made by a web browser are denied for security reasons. It means that browser-based\
+    \ requests are not allowed from 3rd party domains including localhost.\nAll API\
+    \ calls include an API key that could be easily stolen when making a request using\
+    \ a web browser. It means you should use backend languages for API.\n\n## Limits\
+    \ (under construction on API side)\nBe nice. If you're sending too many requests\
+    \ too quickly, we'll send back a\n`503` error code (server unavailable).\nYou\
+    \ are limited to 5000 requests per hour per `access_token` or `client_id`\noverall.\
+    \ Practically, this means you should (when possible) authenticate\nusers so that\
+    \ limits are well outside the reach of a given user.\n\n## Structure\n\n### JSONP\
+    \ (under construction, will be released in next version of API)\nIf you're writing\
+    \ an AJAX application, and you'd like to wrap our response\nwith a callback, all\
+    \ you have to do is specify a callback parameter with\nany API call:\n```\nhttps://api.cloudkibo.com/v1/companyprofile?access_token=fb2e77d.47a0479900504cb3ab4a1f626d174d2d&callback=callbackFunction\n\
+    ```\nWould respond with:\n```js\ncallbackFunction({\n    ...\n});\n```\n"
+  version: "v1"
+  title: "KiboChat API"
+  termsOfService: "http://www.cloudkibo.com/documentation"
+host: "api.cloudkibo.com"
+basePath: "/v1"
+schemes:
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /geographies/{geo-id}/media/recent:
+    get:
+      description: "Get recent media from a geography subscription that you created.\n\
+        **Note**: You can only access Geographies that were explicitly created\nby\
+        \ your OAuth client. Check the Geography Subscriptions section of the\n[real-time\
+        \ updates page](https://instagram.com/developer/realtime/).\nWhen you create\
+        \ a subscription to some geography\nthat you define, you will be returned\
+        \ a unique geo-id that can be used\nin this query. To backfill photos from\
+        \ the location covered by this\ngeography, use the [media search endpoint\n\
+        ](https://instagram.com/developer/endpoints/media/).\n"
+      operationId: "geographiesGeo_idMediaRecentGET"
+      parameters:
+      - name: "geo-id"
+        in: "path"
+        description: "Geolocation ID"
+        required: true
+        type: "integer"
+      - name: "count"
+        in: "query"
+        description: "Max number of media to return."
+        required: false
+        type: "integer"
+      - name: "min_id"
+        in: "query"
+        description: "Return media before this `min_id`."
+        required: false
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+  /userchat/:
+    post:
+      description: "Gives all the chat history between two users"
+      operationId: "userchatPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user1"
+        in: "formData"
+        description: "The phone number of first user in chat"
+        required: true
+        type: "string"
+      - name: "user2"
+        in: "formData"
+        description: "The phone number of second user in chat"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+      x-swagger-router-controller: "Default"
+  /userchat/alluserchat:
+    post:
+      description: "Gives all the chat history of a user with all other people"
+      operationId: "userchatAlluserchatPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user1"
+        in: "formData"
+        description: "The phone number of user in chat"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+      x-swagger-router-controller: "Default"
+  /userchat/getsinglechat:
+    post:
+      description: "Gives details of a single chat message"
+      operationId: "userchatGetsinglechatPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uniqueid"
+        in: "formData"
+        description: "The unique id of a chat message"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+      x-swagger-router-controller: "Default"
+  /userchat/save2:
+    post:
+      description: "Saves the chat sent by user and send it to recipient user"
+      operationId: "userchatSave2POST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "to"
+        in: "formData"
+        description: "The phone number of recipient user"
+        required: true
+        type: "string"
+      - name: "from"
+        in: "formData"
+        description: "The phone number of sender user"
+        required: true
+        type: "string"
+      - name: "date"
+        in: "formData"
+        description: "The date and time of the chat message"
+        required: true
+        type: "string"
+      - name: "fromFullName"
+        in: "formData"
+        description: "The full name of the sender"
+        required: true
+        type: "string"
+      - name: "msg"
+        in: "formData"
+        description: "The body of chat message"
+        required: true
+        type: "string"
+      - name: "uniqueid"
+        in: "formData"
+        description: "The unique id of the chat message"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "formData"
+        description: "The type of the chat message i.e. chat or file"
+        required: true
+        type: "string"
+      - name: "file_type"
+        in: "formData"
+        description: "The type of file attached in chat message"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+definitions:
+  UserChat:
+    type: "object"
+    properties:
+      _id:
+        type: "string"
+      to:
+        type: "string"
+      from:
+        type: "string"
+      fromFullName:
+        type: "string"
+      msg:
+        type: "string"
+      date:
+        type: "string"
+      date_server_received:
+        type: "string"
+      date_server_sent:
+        type: "string"
+      owneruser:
+        type: "string"
+        description: "In one to one chat, we store two copies of the chat message\
+          \ on server. One for each user."
+      uniqueid:
+        type: "string"
+        description: "Unique id of the chat message"
+      status:
+        type: "string"
+        description: "Message status must have value one of these \"pending\", \"\
+          sent\", \"delivered\" and \"seen\""
+      type:
+        type: "string"
+        description: "Type of the chat messages i.e. text message or message with\
+          \ file attachment."
+      file_type:
+        type: "string"
+    description: "All the user chat messages in one to one chat will be stored here"
+  inline_response_200:
+    properties:
+      status:
+        type: "string"
+      msg:
+        type: "array"
+        items:
+          $ref: "#/definitions/UserChat"
+  inline_response_200_1:
+    properties:
+      status:
+        type: "string"
+      uniqueid:
+        type: "string"
