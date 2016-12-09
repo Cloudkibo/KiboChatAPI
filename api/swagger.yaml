@@ -41,36 +41,519 @@ consumes:
 produces:
 - "application/json"
 paths:
-  /geographies/{geo-id}/media/recent:
-    get:
-      description: "Get recent media from a geography subscription that you created.\n\
-        **Note**: You can only access Geographies that were explicitly created\nby\
-        \ your OAuth client. Check the Geography Subscriptions section of the\n[real-time\
-        \ updates page](https://instagram.com/developer/realtime/).\nWhen you create\
-        \ a subscription to some geography\nthat you define, you will be returned\
-        \ a unique geo-id that can be used\nin this query. To backfill photos from\
-        \ the location covered by this\ngeography, use the [media search endpoint\n\
-        ](https://instagram.com/developer/endpoints/media/).\n"
-      operationId: "geographiesGeo_idMediaRecentGET"
+  /filetransfers/checkpendingfile:
+    post:
+      description: "Upload the file for chat attachment"
+      operationId: "filetransfersCheckpendingfilePOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
       parameters:
-      - name: "geo-id"
-        in: "path"
-        description: "Geolocation ID"
+      - name: "uniqueid"
+        in: "formData"
+        description: "unique id of the file"
         required: true
-        type: "integer"
-      - name: "count"
-        in: "query"
-        description: "Max number of media to return."
-        required: false
-        type: "integer"
-      - name: "min_id"
-        in: "query"
-        description: "Return media before this `min_id`."
-        required: false
-        type: "integer"
+        type: "string"
       responses:
         200:
           description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+      x-swagger-router-controller: "Default"
+  /filetransfers/confirmdownload:
+    post:
+      description: "Confirm to the server that file has been downloaded by client"
+      operationId: "filetransfersConfirmdownloadPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uniqueid"
+        in: "formData"
+        description: "unique id of the file"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /filetransfers/download:
+    post:
+      description: "Download the file attached in chat."
+      operationId: "filetransfersDownloadPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uniqueid"
+        in: "formData"
+        description: "unique id of the file"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Ok"
+          schema:
+            type: "file"
+      x-swagger-router-controller: "Default"
+  /filetransfers/upload:
+    post:
+      description: "Upload the file for chat attachment"
+      operationId: "filetransfersUploadPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "to"
+        in: "formData"
+        description: "phone number of person who receives file"
+        required: true
+        type: "string"
+      - name: "from"
+        in: "formData"
+        description: "phone number of person who sends file"
+        required: true
+        type: "string"
+      - name: "filename"
+        in: "formData"
+        description: "name of the file"
+        required: true
+        type: "string"
+      - name: "filesize"
+        in: "formData"
+        description: "size of the file"
+        required: true
+        type: "string"
+      - name: "filetype"
+        in: "formData"
+        description: "type of the file"
+        required: true
+        type: "string"
+      - name: "uniqueid"
+        in: "formData"
+        description: "unique id of the file"
+        required: true
+        type: "string"
+      - name: "file"
+        in: "formData"
+        description: "file attached"
+        required: true
+        type: "file"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /groupchat/:
+    post:
+      description: "Send the chat message to server"
+      operationId: "groupchatPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "group_unique_id"
+        in: "formData"
+        description: "unique id of the group in which message is sent"
+        required: true
+        type: "string"
+      - name: "from"
+        in: "formData"
+        description: "phone number of sender"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "formData"
+        description: "type of message, possible values \"chat\" or \"file\""
+        required: true
+        type: "string"
+      - name: "msg"
+        in: "formData"
+        description: "chat message"
+        required: true
+        type: "string"
+      - name: "from_fullname"
+        in: "formData"
+        description: "full name of person who is sending chat"
+        required: true
+        type: "string"
+      - name: "unique_id"
+        in: "formData"
+        description: "unique id of the chat message"
+        required: true
+        type: "string"
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/GroupChat"
+      x-swagger-router-controller: "Default"
+  /groupchat/fetchSingleChat:
+    post:
+      description: "Fetch single chat message of group from server"
+      operationId: "groupchatFetchSingleChatPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "unique_id"
+        in: "formData"
+        description: "unique id of the chat message"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/GroupChat"
+      x-swagger-router-controller: "Default"
+  /groupchatstatus/:
+    get:
+      description: "Sync group chat messages which are not on device"
+      operationId: "groupchatstatusGET"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/GroupChatStatus1"
+      x-swagger-router-controller: "Default"
+  /groupchatstatus/checkStatus:
+    post:
+      description: "Know Group chat messages status"
+      operationId: "groupchatstatusCheckStatusPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "unique_ids"
+        in: "formData"
+        description: "unique ids of the chat messages in array"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/GroupChatStatus"
+      x-swagger-router-controller: "Default"
+  /groupchatstatus/updateStatus:
+    post:
+      description: "Update group message status"
+      operationId: "groupchatstatusUpdateStatusPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "chat_unique_id"
+        in: "formData"
+        description: "unique id of the chat message"
+        required: true
+        type: "string"
+      - name: "status"
+        in: "formData"
+        description: "new status of chat message"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /groupmessaging/:
+    post:
+      description: "Create Group"
+      operationId: "groupmessagingPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "group_name"
+        in: "formData"
+        description: "name of the group"
+        required: true
+        type: "string"
+      - name: "unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      - name: "members"
+        in: "formData"
+        description: "phone numbers of members"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Group"
+      x-swagger-router-controller: "Default"
+  /groupmessaging/downloadIcon:
+    post:
+      description: "Download the file attached in chat."
+      operationId: "groupmessagingDownloadIconPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Ok"
+          schema:
+            type: "file"
+      x-swagger-router-controller: "Default"
+  /groupmessaging/specificGroup:
+    post:
+      description: "Get Single Group Information"
+      operationId: "groupmessagingSpecificGroupPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      responses:
+        201:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Group"
+      x-swagger-router-controller: "Default"
+  /groupmessaging/uploadIcon:
+    post:
+      description: "Upload group icon"
+      operationId: "groupmessagingUploadIconPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      - name: "file"
+        in: "formData"
+        description: "file attached"
+        required: true
+        type: "file"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /groupmessaginguser/:
+    post:
+      description: "Add members to Group"
+      operationId: "groupmessaginguserPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "group_name"
+        in: "formData"
+        description: "name of the group"
+        required: true
+        type: "string"
+      - name: "group_unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      - name: "members"
+        in: "formData"
+        description: "phone numbers of new members"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_201"
+        501:
+          description: "Unauthorised"
+          schema:
+            $ref: "#/definitions/inline_response_201"
+      x-swagger-router-controller: "Default"
+  /groupmessaginguser/leaveGroup:
+    post:
+      description: "A member is leaving group"
+      operationId: "groupmessaginguserLeaveGroupPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "group_unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /groupmessaginguser/mygroups:
+    get:
+      description: "Get information about my groups from Server"
+      operationId: "groupmessaginguserMygroupsGET"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/GroupMember1"
+      x-swagger-router-controller: "Default"
+  /groupmessaginguser/mygroupsmembers:
+    get:
+      description: "Get information about members of my group"
+      operationId: "groupmessaginguserMygroupsmembersGET"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/GroupMember1"
+      x-swagger-router-controller: "Default"
+  /groupmessaginguser/myspecificgroupsmembers:
+    post:
+      description: "Get information about specific group members"
+      operationId: "groupmessaginguserMyspecificgroupsmembersPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/GroupMember1"
+      x-swagger-router-controller: "Default"
+  /groupmessaginguser/removeFromGroup:
+    post:
+      description: "A Member is removed from Group"
+      operationId: "groupmessaginguserRemoveFromGroupPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "group_unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      - name: "phone"
+        in: "formData"
+        description: "phone number of the member who is being removed"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+        501:
+          description: "Unauthorised"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /groupmessaginguser/updateRole:
+    post:
+      description: "Update role of group member"
+      operationId: "groupmessaginguserUpdateRolePOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "group_unique_id"
+        in: "formData"
+        description: "unique id of the group"
+        required: true
+        type: "string"
+      - name: "member_phone"
+        in: "formData"
+        description: "phone number of the member whose role is being updated"
+        required: true
+        type: "string"
+      - name: "makeAdmin"
+        in: "formData"
+        description: "possible values \"Yes\" or \"No\""
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
       x-swagger-router-controller: "Default"
   /userchat/:
     post:
@@ -95,7 +578,7 @@ paths:
         200:
           description: "OK"
           schema:
-            $ref: "#/definitions/inline_response_200"
+            $ref: "#/definitions/inline_response_200_2"
       x-swagger-router-controller: "Default"
   /userchat/alluserchat:
     post:
@@ -115,7 +598,7 @@ paths:
         200:
           description: "OK"
           schema:
-            $ref: "#/definitions/inline_response_200"
+            $ref: "#/definitions/inline_response_200_2"
       x-swagger-router-controller: "Default"
   /userchat/getsinglechat:
     post:
@@ -135,7 +618,29 @@ paths:
         200:
           description: "OK"
           schema:
-            $ref: "#/definitions/inline_response_200"
+            $ref: "#/definitions/inline_response_200_2"
+      x-swagger-router-controller: "Default"
+  /userchat/partialchatsync:
+    post:
+      description: "Gives partial chat history of a user with all other people. It\
+        \ won't give the messages which are already on user's device or are sent by\
+        \ user to others."
+      operationId: "userchatPartialchatsyncPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user1"
+        in: "formData"
+        description: "The phone number of user in chat"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_2"
       x-swagger-router-controller: "Default"
   /userchat/save2:
     post:
@@ -190,7 +695,123 @@ paths:
         200:
           description: "OK"
           schema:
+            $ref: "#/definitions/inline_response_200_3"
+      x-swagger-router-controller: "Default"
+  /userchat/updateStatus:
+    post:
+      description: "updates the delivered or read status of a particular chat message"
+      operationId: "userchatUpdateStatusPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uniqueid"
+        in: "formData"
+        description: "The unique id of a chat message"
+        required: true
+        type: "string"
+      - name: "status"
+        in: "formData"
+        description: "The new status of a chat message"
+        required: true
+        type: "string"
+      - name: "sender"
+        in: "formData"
+        description: "The sender of the message who should be informed about new status\
+          \ of the chat message"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_3"
+      x-swagger-router-controller: "Default"
+  /users/log:
+    post:
+      description: "Saves client side logs."
+      operationId: "usersLogPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "data"
+        in: "formData"
+        description: "client side log message"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
             $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /users/newuser:
+    post:
+      description: "Create new user on server after doing facebook phone number authentication\
+        \ on client application."
+      operationId: "usersNewuserPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "display_name"
+        in: "formData"
+        description: "The display name given by user"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/User"
+      x-swagger-router-controller: "Default"
+  /users/searchaccountsbyphone:
+    post:
+      description: "Get phone numbers from client and returns two arrays of phone\
+        \ numbers, indicating which ones are on KiboChat and which ones are not."
+      operationId: "usersSearchaccountsbyphonePOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "phonenumbers"
+        in: "formData"
+        description: "List of phone numbers"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_200_4"
+      x-swagger-router-controller: "Default"
+  /users/setstatusmessage:
+    post:
+      description: "Set status message for user."
+      operationId: "usersSetstatusmessagePOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "formData"
+        description: "New status message"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/inline_response_201"
       x-swagger-router-controller: "Default"
 definitions:
   UserChat:
@@ -230,7 +851,183 @@ definitions:
       file_type:
         type: "string"
     description: "All the user chat messages in one to one chat will be stored here"
+  User:
+    type: "object"
+    properties:
+      country_prefix:
+        type: "string"
+      date:
+        type: "string"
+      display_name:
+        type: "string"
+      id:
+        type: "string"
+      national_number:
+        type: "string"
+      phone:
+        type: "string"
+      status:
+        type: "string"
+      _id:
+        type: "string"
+      picture:
+        type: "string"
+    description: "All the details of user account are stored here"
+  FileTransfers:
+    type: "object"
+    properties:
+      to:
+        type: "string"
+      from:
+        type: "string"
+      date:
+        type: "string"
+      uniqueid:
+        type: "string"
+      file_name:
+        type: "string"
+      file_size:
+        type: "string"
+      path:
+        type: "string"
+      file_type:
+        type: "string"
+      _id:
+        type: "string"
+    description: "Details of files which are transferred between users during chat"
+  GroupChat:
+    type: "object"
+    properties:
+      group_unique_id:
+        type: "string"
+      from:
+        type: "string"
+      type:
+        type: "string"
+      msg:
+        type: "string"
+      from_fullname:
+        type: "string"
+      unique_id:
+        type: "string"
+      date:
+        type: "string"
+    description: "Details of chat messages sent in group"
+  GroupChatStatus:
+    type: "object"
+    properties:
+      msg_unique_id:
+        type: "string"
+      chat_unique_id:
+        type: "string"
+      status:
+        type: "string"
+      user_phone:
+        type: "string"
+      read_date:
+        type: "string"
+      delivered_date:
+        type: "string"
+    description: "Details of chat message status in group. Status can be \"pending\"\
+      , \"sent\", \"delivered\" or \"seen\""
+  Group:
+    type: "object"
+    properties:
+      group_name:
+        type: "string"
+      group_icon:
+        type: "string"
+      unique_id:
+        type: "string"
+      date_creation:
+        type: "string"
+    description: "Details of Group"
+  GroupMember:
+    type: "object"
+    properties:
+      group_unique_id:
+        type: "string"
+      member_phone:
+        type: "string"
+      display_name:
+        type: "string"
+      isAdmin:
+        type: "string"
+      membership_status:
+        type: "string"
+      date_join:
+        type: "string"
+      date_left:
+        type: "string"
+    description: "Details of group"
+  GroupChat1:
+    type: "object"
+    properties:
+      group_unique_id:
+        $ref: "#/definitions/Group"
+      from:
+        type: "string"
+      type:
+        type: "string"
+      msg:
+        type: "string"
+      from_fullname:
+        type: "string"
+      unique_id:
+        type: "string"
+      date:
+        type: "string"
+    description: "Details of chat messages sent in group"
+  GroupChatStatus1:
+    type: "object"
+    properties:
+      msg_unique_id:
+        $ref: "#/definitions/GroupChat1"
+      chat_unique_id:
+        type: "string"
+      status:
+        type: "string"
+      user_phone:
+        type: "string"
+      read_date:
+        type: "string"
+      delivered_date:
+        type: "string"
+    description: "Details of chat message status in group. Status can be \"pending\"\
+      , \"sent\", \"delivered\" or \"seen\""
+  GroupMember1:
+    type: "object"
+    properties:
+      group_unique_id:
+        $ref: "#/definitions/Group"
+      member_phone:
+        type: "string"
+      display_name:
+        type: "string"
+      isAdmin:
+        type: "string"
+      membership_status:
+        type: "string"
+      date_join:
+        type: "string"
+      date_left:
+        type: "string"
+    description: "Details of group"
   inline_response_200:
+    properties:
+      filepending:
+        $ref: "#/definitions/FileTransfers"
+  inline_response_200_1:
+    properties:
+      status:
+        type: "string"
+  inline_response_201:
+    properties:
+      status:
+        type: "string"
+      msg:
+        type: "string"
+  inline_response_200_2:
     properties:
       status:
         type: "string"
@@ -238,9 +1035,21 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/UserChat"
-  inline_response_200_1:
+  inline_response_200_3:
     properties:
       status:
         type: "string"
       uniqueid:
         type: "string"
+  inline_response_200_4:
+    properties:
+      available:
+        type: "array"
+        items:
+          type: "string"
+          description: "phone number"
+      notAvailable:
+        type: "array"
+        items:
+          type: "string"
+          description: "phone number"
