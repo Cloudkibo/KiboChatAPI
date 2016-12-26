@@ -60,7 +60,7 @@ info:
 #                  Host, Base Path, Schemes and Content Types                  #
 ################################################################################
 host: api.cloudkibo.com
-basePath: /api
+basePath: /v1
 schemes:
   - https
 produces:
@@ -279,7 +279,7 @@ paths:
                 type: string
   /userchat/partialchatsync:
     post:
-      description: Gives partial chat history of a user with all other people. It won't give the messages which are already on user's device or are sent by user to others.
+      description: Gives partial chat history of a user with all other people. It won't give the messages which are already on user's device or are sent by user to others. We should also note that all the messages which are sent to client by server will be marked as delivered.
       consumes:
         - application/json
       produces:
